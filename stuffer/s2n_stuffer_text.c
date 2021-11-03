@@ -109,6 +109,12 @@ int s2n_stuffer_skip_read_until(struct s2n_stuffer *stuffer, const char *target)
 
 /* Skips the stuffer until the first instance of the target character or until there is no more data. */
 int s2n_stuffer_skip_to_char(struct s2n_stuffer *stuffer, const char target)
+    // memory safety contract
+    CONTRACT_REQUIRES(s2n_result_is_ok(s2n_stuffer_validate(stuffer)))
+    CONTRACT_REQUIRES(stuffer->blob.size <= MAX_BLOB_SIZE)          
+    // MAX_BLOB_SIZE must be defined in proof Makefile
+    CONTRACT_ENSURES(s2n_result_is_ok(s2n_stuffer_validate(stuffer)))
+    CONTRACT_ASSIGNS(stuffer->read_cursor)
 {
     POSIX_PRECONDITION(s2n_stuffer_validate(stuffer));
     while (s2n_stuffer_data_available(stuffer) > 0) {
