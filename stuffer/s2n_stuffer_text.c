@@ -129,6 +129,11 @@ int s2n_stuffer_skip_to_char(struct s2n_stuffer *stuffer, const char target)
 
 /* Skips an expected character in the stuffer between min and max times */
 int s2n_stuffer_skip_expected_char(struct s2n_stuffer *stuffer, const char expected, const uint32_t min, const uint32_t max, uint32_t *skipped)
+    CONTRACT_REQUIRES(s2n_result_is_ok(s2n_stuffer_validate(stuffer)))
+    CONTRACT_REQUIRES(min <= max)
+    CONTRACT_ENSURES(s2n_result_is_ok(s2n_stuffer_validate(stuffer)))
+    CONTRACT_ASSIGNS(stuffer->read_cursor, *skipped, 
+                     s2n_debug_str, s2n_errno)     // written by macro POSIX_ENSURE
 {
     POSIX_PRECONDITION(s2n_stuffer_validate(stuffer));
     POSIX_ENSURE(min <= max, S2N_ERR_SAFETY);
